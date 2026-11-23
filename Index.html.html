@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo de ti - Hello Kitty Edition 💕💞</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hkCream: '#FFF8FA',
+                        hkBlush: '#FFE4EC',
+                        hkPink: '#FF85A1',
+                        hkRed: '#E11D48',
+                        hkDeep: '#9F1239',
+                        hkPlum: '#4C0519',
+                        hkGold: '#FACC15'
+                    },
+                    fontFamily: {
+                        cute: ['"Fredoka"', 'sans-serif'],
+                        script: ['"Great Vibes"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFF8FA;
+            background-image:
+                radial-gradient(#FFC2D1 1.2px, transparent 1.2px),
+                radial-gradient(#FFE4EC 1.2px, #FFF8FA 1.2px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+            color: #4C0519;
+            overflow-x: hidden;
+        }
+
+        /* Capa de corazones y moñitos flotantes */
+        .floating-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .float-item {
+            position: absolute;
+            bottom: -50px;
+            opacity: 0;
+            animation: driftUp linear infinite;
+            user-select: none;
+        }
+
+        @keyframes driftUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            15% { opacity: 0.75; }
+            85% { opacity: 0.6; }
+            100% { transform: translateY(-112vh) rotate(320deg) scale(1.15); opacity: 0; }
+        }
+
+        /* Tarjetas organizadas estilo Hello Kitty */
+        .hk-card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 2.5px solid #FFC2D1;
+            border-radius: 28px;
+            box-shadow: 0 14px 32px -10px rgba(225, 29, 72, 0.14);
+        }
+
+        /* Marco Polaroid kawaii */
+        .hk-polaroid {
+            background: #FFFFFF;
+            padding: 12px 12px 22px 12px;
+            border-radius: 22px;
+            border: 2px solid #FFB3C6;
+            box-shadow: 0 12px 26px -8px rgba(225, 29, 72, 0.16);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+        }
+
+        .hk-polaroid:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 36px -10px rgba(225, 29, 72, 0.26);
+        }
+
+        /* Sello de lacre / moñito */
+        @keyframes pulseBow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.07); }
+        }
+
+        .bow-pulse {
+            animation: pulseBow 2.2s infinite ease-in-out;
+        }
+
+        /* Tarjetas 3D para las 10 razones */
+        .flip-card {
+            perspective: 1000px;
+            height: 162px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-front, .flip-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 22px;
+        }
+
+        .flip-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Papel carta kawaii */
+        .hk-letter-paper {
+            background-color: #FFFDFD;
+            background-image: linear-gradient(to bottom, rgba(255, 133, 161, 0.14) 1px, transparent 1px);
+            background-size: 100% 2.1rem;
+            line-height: 2.1rem;
+        }
+
+        /* Cupón perforado */
+        .hk-coupon {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF0F5 100%);
+            border: 2px dashed #FF85A1;
+        }
+
+        /* Modo diversión */
+        @keyframes kawaiiWiggle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-7px) rotate(-1.2deg); }
+            75% { transform: translateY(-4px) rotate(1.2deg); }
+        }
+
+        .fun-mode .hk-polaroid,
+        .fun-mode .hk-coupon,
+        .fun-mode .flip-card {
+            animation: kawaiiWiggle 1.7s ease-in-out infinite;
+        }
+
+        @keyframes wheelSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(24deg) scale(1.08); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        .wheel-spinning {
+            animation: wheelSpin 0.4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-hkBlush selection:text-hkPlum">
+
+    <!-- Capa de corazones 💕💞 y moñitos 🎀 flotantes -->
+    <div id="floating-layer" class="floating-layer" aria-hidden="true"></div>
+
+    <!-- Barra de navegación organizada y limpia -->
+    <nav class="sticky top-3 z-40 max-w-fit mx-auto px-3 sm:px-5 py-2 rounded-full bg-white/95 backdrop-blur-md border-2 border-hkBlush shadow-md flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm font-cute font-semibold text-hkDeep">
+        <a href="#inicio" class="px-2.5 py-1 rounded-full hover:bg-hkBlush transition">🎀 Inicio</a>
+        <a href="#recuerdos" class="px-2.5 py-1 rounded-full hover:bg-hkBlush transition">📸 Fotos</a>
+        <a href="#carta-poema" class="px-2.5 py-1 rounded-full hover:bg-hkBlush transition">💌 Carta &amp; Poema</a>
+        <a href="#razones" class="px-2.5 py-1 rounded-full hover:bg-hkBlush transition">💖 10 Razones</a>
+        <a href="#planes-vales" class="px-2.5 py-1 rounded-full hover:bg-hkBlush transition">🎡 Planes &amp; Vales</a>
+        <a href="#propuesta" class="px-3 py-1 rounded-full bg-hkRed text-white hover:bg-hkDeep transition shadow-sm">💕 Sorpresa</a>
+    </nav>
+
+    <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 space-y-12 sm:space-y-16">
+
+        <!-- =========================================================
+             SECCIÓN 1: PORTADA HELLO KITTY ORGANIZADA
+        ========================================================== -->
+        <header id="inicio" class="hk-card p-7 sm:p-12 text-center relative overflow-hidden">
+            <!-- Esquinas decorativas con moñitos -->
+            <span class="absolute top-4 left-5 text-2xl sm:text-3xl select-none">🎀</span>
+            <span class="absolute top-4 right-5 text-2xl sm:text-3xl select-none">🎀</span>
+
+            <!-- Ilustración SVG tierna estilo Hello Kitty -->
+            <div class="w-28 h-24 mx-auto mb-3 bow-pulse" aria-label="Hello Kitty Kawaii">
+                <svg viewBox="0 0 220 180" class="w-full h-full drop-shadow-sm">
+                    <!-- Oreja izquierda -->
+                    <path d="M45 75 L35 22 L85 48 Z" fill="#FFFFFF" stroke="#4C0519" stroke-width="5" stroke-linejoin="round"/>
+                    <!-- Oreja derecha -->
+                    <path d="M175 75 L185 22 L135 48 Z" fill="#FFFFFF" stroke="#4C0519" stroke-width="5" stroke-linejoin="round"/>
+                    <!-- Cara -->
+                    <ellipse cx="110" cy="105" rx="76" ry="56" fill="#FFFFFF" stroke="#4C0519" stroke-width="5"/>
+                    <!-- Ojos -->
+                    <ellipse cx="76" cy="108" rx="6" ry="8.5" fill="#4C0519"/>
+                    <ellipse cx="144" cy="108" rx="6" ry="8.5" fill="#4C0519"/>
+                    <!-- Naricita amarilla -->
+                    <ellipse cx="110" cy="121" rx="8" ry="5.5" fill="#FACC15" stroke="#4C0519" stroke-width="3.5"/>
+                    <!-- Bigotes izquierdos -->
+                    <line x1="22" y1="96" x2="48" y2="100" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="18" y1="112" x2="46" y2="112" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="24" y1="128" x2="49" y2="123" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <!-- Bigotes derechos -->
+                    <line x1="198" y1="96" x2="172" y2="100" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="202" y1="112" x2="174" y2="112" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="196" y1="128" x2="171" y2="123" stroke="#4C0519" stroke-width="4.5" stroke-linecap="round"/>
+                    <!-- Moñito clásico en su oreja derecha -->
+                    <g transform="translate(152, 46) rotate(18)">
+                        <path d="M-24 -14 C-32 -22, -32 22, -24 14 L-4 5 L-4 -5 Z" fill="#E11D48" stroke="#4C0519" stroke-width="4" stroke-linejoin="round"/>
+                        <path d="M24 -14 C32 -22, 32 22, 24 14 L4 5 L4 -5 Z" fill="#E11D48" stroke="#4C0519" stroke-width="4" stroke-linejoin="round"/>
+                        <circle cx="0" cy="0" r="9" fill="#FF4D6D" stroke="#4C0519" stroke-width="4"/>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-hkBlush text-hkDeep font-cute text-xs sm:text-sm font-semibold mb-3">
+                <span>🎀 ✨ Un pequeño rincón hecho solo para ti ✨ 🎀</span>
+            </div>
+
+            <h1 class="font-script text-7xl sm:text-8xl md:text-9xl text-hkRed leading-none mb-3">
+                Todo de ti 💕💞
+            </h1>
+
+            <p class="text-sm sm:text-lg text-hkPlum/80 max-w-xl mx-auto mb-6 font-medium">
+                “Porque desde que llegaste a mi vida, cada día tiene una razón más bonita y tierna para sonreír.” 💕💞
+            </p>
+
+            <!-- Banner del modo diversión -->
+            <div id="fun-phrase-banner" class="hidden max-w-lg mx-auto mb-5 px-4 py-2.5 rounded-2xl bg-hkBlush/90 border border-hkPink text-hkDeep text-xs sm:text-sm font-semibold">
+                🎀 ¡Modo Hello Kitty activado! Dúo imparable lleno de ternura 💕💞
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="#recuerdos"
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-hkRed hover:bg-hkDeep text-white font-cute font-semibold text-sm sm:text-base shadow-md transition">
+                    <span>Ver nuestros recuerdos</span>
+                    <span>🎀💕</span>
+                </a>
+                <button id="fun-mode-btn" type="button" onclick="toggleFunMode()"
+                        class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-hkBlush text-hkDeep border-2 border-hkPink font-cute font-semibold text-sm sm:text-base shadow-sm transition cursor-pointer">
+                    <span>¡Modo diversión 💕💞!</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- =========================================================
+             SECCIÓN 2: ÁLBUM DE FOTOS ORGANIZADO (3 COLUMNAS LIMPIAS)
+        ========================================================== -->
+        <section id="recuerdos" class="hk-card p-6 sm:p-10">
+            <div class="text-center mb-8">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-hkBlush text-hkDeep font-cute text-xs font-semibold uppercase tracking-wider mb-1">
+                    🎀 Galería Kawaii 🎀
+                </span>
+                <h2 class="font-cute text-3xl sm:text-4xl font-bold text-hkRed">
+                    Nuestros Momentos Favoritos 💕💞
+                </h2>
+                <p class="text-xs sm:text-sm text-hkPlum/70 mt-1">
+                    Toca cualquier foto para ampliarla o cámbiala si lo deseas 💕
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <!-- Foto 1 -->
+                <div class="hk-polaroid flex flex-col justify-between group">
+                    <div>
+                        <div onclick="openLightbox(this.querySelector('img').src, 'Mi persona favorita 💞')"
+                             class="aspect-[3/4] w-full rounded-2xl overflow-hidden bg-hkBlush relative cursor-pointer">
+                            <img id="img-card-1"
+                                 src="https://lh3.googleusercontent.com/gg/AJWXcNf8okQYR1xfGZvILsJGE9vNUzKguzyiYa3HHzhNvKk7Kvv4tYS-kJE5ym8HIJGBb-TJPnQh0WOnV_lTw5_Uj015deJG3BXKBmmcfMT8_P3J4PlkxFzwH4bbQWmxXngHlPOxGIQaTU9doHLkgLkG7S4gE0SqMAgTcYYjnk35O_ZedqaW_MjK3hWPfsq3EOjd9hkRnyDo939bylZFumv4L1M0qoJiJFbRKZJScVq3Zo-w3_kTjZ-9PDPwi8n7w6uDcMatQrvhy14FWN4BOhGU0t3DuhcfkmetuHI=s0"
+                                 alt="Mi persona favorita"
+                                 onerror="fallbackPhoto(this, 1)"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <p class="font-script text-3xl text-center text-hkPlum mt-3">
+                            Mi persona favorita 💞
+                        </p>
+                        <p class="text-[11px] text-center text-hkPlum/70">
+                            Tu sonrisa, tus gafas delgadas y tu vibra única 💕
+                        </p>
+                    </div>
+                    <label for="file-1" class="mt-3 mx-auto flex items-center justify-center gap-1 w-fit px-3 py-1 rounded-full bg-hkBlush hover:bg-hkPink/30 text-[11px] font-semibold text-hkDeep cursor-pointer transition">
+                        <span>📷 Cambiar foto</span>
+                    </label>
+                    <input type="file" id="file-1" accept="image/*" class="hidden" onchange="customPhoto(event, 'img-card-1')">
+                </div>
+
+                <!-- Foto 2 -->
+                <div class="hk-polaroid flex flex-col justify-between border-hkRed/50 group">
+                    <div>
+                        <div onclick="openLightbox(this.querySelector('img').src, 'Nosotros 💕💞')"
+                             class="aspect-[3/4] w-full rounded-2xl overflow-hidden bg-hkBlush relative cursor-pointer">
+                            <img id="img-card-2"
+                                 src="https://lh3.googleusercontent.com/gg/AJWXcNdz8VF6N-nMm8e273gtHaBI-tiWRlHNGDTemSzuALBru0snAxXC_NlBzlSQKVglNDHAbNhxmGla3ttfycSJf6QQ2KrX_oBVlmi_Qt_2Ii6xc9yVOZlep8WD5xN9vUOVSpQDzeEAWx7corPov2ZLL1xxeymySLvp6YwZ9UNEPmuCh17dkhvcj5mkSdfEe_X4qrtW80HYAtn7sT13XTZZbzDYBEce2JczB6wcbKzbE1O2DnkrIKZRNKnds2iEIUjErxd84eQslKdnv4zHDxyxocuM3SC2gYl78wHQsdyhogFJIfa0oH_G678hcQRgkWElXoH5suiSs-U58kYRkNCInEhW=s0"
+                                 alt="Nosotros"
+                                 onerror="fallbackPhoto(this, 2)"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <p class="font-script text-3xl text-center text-hkRed mt-3">
+                            Nosotros 🎀💕💞
+                        </p>
+                        <p class="text-[11px] text-center text-hkDeep/80">
+                            Siempre juntos en cada aventura 💞
+                        </p>
+                    </div>
+                    <label for="file-2" class="mt-3 mx-auto flex items-center justify-center gap-1 w-fit px-3 py-1 rounded-full bg-hkBlush hover:bg-hkPink/30 text-[11px] font-semibold text-hkDeep cursor-pointer transition">
+                        <span>📷 Cambiar foto</span>
+                    </label>
+                    <input type="file" id="file-2" accept="image/*" class="hidden" onchange="customPhoto(event, 'img-card-2')">
+                </div>
+
+                <!-- Foto 3 -->
+                <div class="hk-polaroid flex flex-col justify-between group">
+                    <div>
+                        <div onclick="openLightbox(this.querySelector('img').src, 'Hermosa 💕')"
+                             class="aspect-[3/4] w-full rounded-2xl overflow-hidden bg-hkBlush relative cursor-pointer">
+                            <img id="img-card-3"
+                                 src="https://lh3.googleusercontent.com/gg/AJWXcNetUwRd1ZybBof8hHRHqxFpF0ug1NdTlEFZGYggIkngme9S8PjaerVTjhqX9ZkWEpAsOv8KBsmKw8NfABlPEY5PpEtph7e6MW4tFXZ7I74hH5jfcOiCVfVylgvygUjAvtiwP6_vc4N3xIX3wQ7r2QFP6o8X50Ev6ZiQP66ndkmP_8F9PYfygedWOIl7tiBjjfta-cFq6FUbmsJ5-VFOea830_D7GQc0pV3qGW4vkzaZS6OHJx-zMDTYXxQDwMwhydsSqnljmkLcprWYIO0I45yuhnJgtpZV2CY=s0"
+                                 alt="Hermosa"
+                                 onerror="fallbackPhoto(this, 3)"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <p class="font-script text-3xl text-center text-hkPlum mt-3">
+                            Hermosa 💕
+                        </p>
+                        <p class="text-[11px] text-center text-hkPlum/70">
+                            Nuestra complicidad en cada detalle 💕💞
+                        </p>
+                    </div>
+                    <label for="file-3" class="mt-3 mx-auto flex items-center justify-center gap-1 w-fit px-3 py-1 rounded-full bg-hkBlush hover:bg-hkPink/30 text-[11px] font-semibold text-hkDeep cursor-pointer transition">
+                        <span>📷 Cambiar foto</span>
+                    </label>
+                    <input type="file" id="file-3" accept="image/*" class="hidden" onchange="customPhoto(event, 'img-card-3')">
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             SECCIÓN 3: CARTA DE AMOR Y POEMA EN GRID ORDENADO (2 COLUMNAS)
+        ========================================================== -->
+        <section id="carta-poema" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            <!-- Columna 1: Sobre con Moñito Hello Kitty -->
+            <div class="hk-card p-6 sm:p-8 flex flex-col justify-center">
+                <div id="sealed-envelope" onclick="breakSeal()"
+                     class="cursor-pointer rounded-2xl bg-gradient-to-br from-hkBlush/70 via-white to-hkBlush p-8 text-center border-2 border-dashed border-hkPink hover:border-hkRed transition-all group">
+                    <span class="text-xs font-cute uppercase tracking-widest text-hkDeep font-semibold block mb-1">
+                        Para leer con el corazón
+                    </span>
+                    <h2 class="font-cute text-3xl sm:text-4xl font-bold text-hkRed mb-5">
+                        💌 Carta de amor
+                    </h2>
+
+                    <div class="bow-pulse w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-hkRed to-hkPink text-white flex flex-col items-center justify-center shadow-lg border-4 border-white mb-5">
+                        <span class="text-3xl leading-none">🎀</span>
+                        <span class="text-[11px] font-cute font-bold uppercase tracking-wider mt-1">Abrir</span>
+                    </div>
+
+                    <p class="text-xs sm:text-sm text-hkPlum/80 font-medium">
+                        Toca el moñito de Hello Kitty para abrir tu carta 💕💞
+                    </p>
+                </div>
+
+                <div id="opened-letter" class="hidden rounded-2xl hk-letter-paper p-6 sm:p-7 border border-hkPink/50">
+                    <div class="flex items-center justify-between border-b border-hkPink/40 pb-3 mb-4">
+                        <h3 class="font-cute text-2xl font-bold text-hkRed">
+                            💌 Carta de amor 🎀
+                        </h3>
+                        <button type="button" onclick="resealEnvelope()"
+                                class="text-xs font-cute font-semibold text-hkDeep bg-hkBlush hover:bg-hkPink/30 px-3 py-1 rounded-full transition cursor-pointer">
+                            Cerrar ✉️
+                        </button>
+                    </div>
+                    <div class="text-sm sm:text-base text-hkPlum space-y-4">
+                        <p class="font-bold text-hkDeep">Mi amor,</p>
+                        <p>
+                            Quería tomarme un momento para escribirte esto y recordarte lo inmensamente feliz que me hace tenerte en mi vida. A veces las palabras se quedan cortas para expresar todo lo que siento, pero quiero que sepas que cada momento a tu lado se vuelve mi parte favorita del día. Me encanta tu risa, me encanta cómo eres conmigo, la complicidad que tenemos y la forma en que iluminas todo con solo estar ahí.
+                        </p>
+                        <p>
+                            Gracias por ser mi compañera, por tus detalles, por apoyarme y por hacerme sentir tan afortunado. Te amo muchísimo, hoy, mañana y siempre. 💕💞
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 2: Poema en tarjeta ordenada -->
+            <div class="hk-card p-6 sm:p-8 flex flex-col justify-center text-center relative overflow-hidden">
+                <span class="text-xs font-cute uppercase tracking-widest text-hkDeep font-semibold mb-1">
+                    Versos inspirados en ti
+                </span>
+                <h2 class="font-cute text-3xl sm:text-4xl font-bold text-hkRed mb-6">
+                    ✨ Un poema para ti 🎀
+                </h2>
+
+                <div class="bg-hkBlush/45 rounded-2xl p-6 border border-hkPink/40 italic text-base sm:text-lg text-hkPlum/90 leading-relaxed space-y-5 font-medium">
+                    <p>
+                        Bajo tus gafas de aros sutiles,<br>
+                        se esconde la magia que guía mis días,<br>
+                        una sonrisa de dulces matices<br>
+                        que alegra mis horas y mis alegrías.
+                    </p>
+                    <div class="text-hkRed text-sm not-italic">🎀 💕 ✦ 💞 🎀</div>
+                    <p>
+                        En este camino que andamos los dos,<br>
+                        tu mano en la mía es mi refugio y mi paz,<br>
+                        eres melodía, lucero y mi voz,<br>
+                        y cada momento te quiero mucho más. 💞
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             SECCIÓN 4: 10 RAZONES POR LAS QUE TE AMO (GRID SIMÉTRICO 2x5)
+        ========================================================== -->
+        <section id="razones" class="hk-card p-6 sm:p-10">
+            <div class="text-center mb-8">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-hkBlush text-hkDeep font-cute text-xs font-semibold uppercase tracking-wider mb-1">
+                    🎀 Toca cada tarjeta para girarla 🎀
+                </span>
+                <h2 class="font-cute text-3xl sm:text-4xl font-bold text-hkRed mb-3">
+                    💖 10 razones por las que te amo 💕💞
+                </h2>
+
+                <div class="inline-flex flex-wrap items-center justify-center gap-3">
+                    <span id="flip-counter" class="px-4 py-1.5 rounded-full bg-hkBlush text-xs sm:text-sm font-cute font-semibold text-hkDeep">
+                        Descubiertas: 0 / 10 💕
+                    </span>
+                    <button type="button" onclick="flipAllCards()"
+                            class="px-4 py-1.5 rounded-full bg-hkRed hover:bg-hkDeep text-white text-xs sm:text-sm font-cute font-semibold shadow-sm transition cursor-pointer">
+                        ¡Voltear todas! 🎀💞
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid perfectamente simétrico de 2 columnas en desktop (5 filas x 2 columnas = 10 tarjetas) -->
+            <div id="reasons-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Se llenan con JS -->
+            </div>
+        </section>
+
+        <!-- =========================================================
+             SECCIÓN 5: RULETA DIVERTIDA Y VALES DE AMOR ORGANIZADOS
+        ========================================================== -->
+        <section id="planes-vales" class="hk-card p-6 sm:p-10">
+            <div class="text-center mb-8">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-hkBlush text-hkDeep font-cute text-xs font-semibold uppercase tracking-wider mb-1">
+                    🎀 Diversión &amp; Regalos 🎀
+                </span>
+                <h2 class="font-cute text-3xl sm:text-4xl font-bold text-hkRed">
+                    ¿Qué plan nos toca hoy? 💕💞
+                </h2>
+            </div>
+
+            <!-- Ruleta de planes -->
+            <div class="max-w-xl mx-auto mb-8 rounded-2xl bg-hkBlush/60 border-2 border-hkPink/50 p-6 text-center">
+                <div id="roulette-badge" class="w-16 h-16 mx-auto mb-3 rounded-full bg-white border-2 border-hkRed/40 flex items-center justify-center text-3xl shadow-sm">
+                    🎡
+                </div>
+                <p id="roulette-result" class="font-cute text-lg sm:text-xl text-hkPlum mb-4 min-h-[3rem] flex items-center justify-center">
+                    Toca el botón para sortear nuestro plan de hoy 🎀💕💞
+                </p>
+                <button id="spin-plan-btn" type="button" onclick="spinPlanRoulette()"
+                        class="px-6 py-2.5 rounded-full bg-hkRed hover:bg-hkDeep text-white font-cute font-semibold text-sm shadow-md transition cursor-pointer">
+                    Girar ruleta de planes 💕💞
+                </button>
+            </div>
+
+            <!-- 3 Vales en fila ordenada -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div onclick="redeemCoupon(this)" class="hk-coupon rounded-2xl p-5 text-center shadow-sm cursor-pointer hover:-translate-y-1 transition select-none">
+                    <div class="text-3xl mb-2">🍦🎀</div>
+                    <h3 class="font-cute font-bold text-hkDeep text-base mb-1">Vale por tu antojo favorito</h3>
+                    <p class="text-xs text-hkPlum/75 mb-3">Válido por un helado, postre o comida rica juntos 💕</p>
+                    <span class="status-badge inline-block px-4 py-1 rounded-full bg-hkBlush text-hkRed text-xs font-cute font-bold">
+                        Tocar para canjear 💞
+                    </span>
+                </div>
+
+                <div onclick="redeemCoupon(this)" class="hk-coupon rounded-2xl p-5 text-center shadow-sm cursor-pointer hover:-translate-y-1 transition select-none">
+                    <div class="text-3xl mb-2">🎬🍿</div>
+                    <h3 class="font-cute font-bold text-hkDeep text-base mb-1">Vale por tarde de pelis</h3>
+                    <p class="text-xs text-hkPlum/75 mb-3">Tú eliges la película y yo llevo todos los snacks 💕</p>
+                    <span class="status-badge inline-block px-4 py-1 rounded-full bg-hkBlush text-hkRed text-xs font-cute font-bold">
+                        Tocar para canjear 💞
+                    </span>
+                </div>
+
+                <div onclick="redeemCoupon(this)" class="hk-coupon rounded-2xl p-5 text-center shadow-sm cursor-pointer hover:-translate-y-1 transition select-none">
+                    <div class="text-3xl mb-2">🤗💖</div>
+                    <h3 class="font-cute font-bold text-hkDeep text-base mb-1">Vale por abrazos infinitos</h3>
+                    <p class="text-xs text-hkPlum/75 mb-3">Canjeable en cualquier momento, sin fecha de vencimiento 💕</p>
+                    <span class="status-badge inline-block px-4 py-1 rounded-full bg-hkBlush text-hkRed text-xs font-cute font-bold">
+                        Tocar para canjear 💞
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             SECCIÓN 6: GRAN PROPUESTA FINAL CON HELLO KITTY
+        ========================================================== -->
+        <footer id="propuesta">
+            <div class="rounded-3xl bg-gradient-to-br from-hkPlum via-hkDeep to-hkRed p-7 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden border-4 border-hkBlush">
+                <span class="absolute top-4 left-5 text-2xl opacity-80">🎀</span>
+                <span class="absolute top-4 right-5 text-2xl opacity-80">🎀</span>
+
+                <p class="text-hkBlush text-sm font-cute font-medium mb-1">
+                    Simplemente porque eres tú...
+                </p>
+                <h2 class="font-script text-5xl sm:text-6xl leading-tight mb-6">
+                    🌸 💕 Con todo mi amor, por y para siempre 💕 🌸
+                </h2>
+
+                <div id="proposal-card" class="max-w-xl mx-auto my-6 p-6 sm:p-8 rounded-3xl bg-white/15 backdrop-blur-md border-2 border-white/35 shadow-xl relative">
+                    <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/20 text-hkBlush text-xs font-cute font-bold uppercase tracking-wider mb-3">
+                        <span>🎀 Momento de la verdad 🎀</span>
+                    </div>
+
+                    <h3 id="proposal-title" class="font-script text-5xl sm:text-7xl text-white drop-shadow mb-3">
+                        ¿Puedo ser tu novio? 💕💞
+                    </h3>
+
+                    <p id="proposal-subtitle" class="text-xs sm:text-sm text-hkBlush mb-6 max-w-md mx-auto">
+                        Prometo hacerte reír todos los días, cuidarte, apoyarte y seguir coleccionando momentos inolvidables juntos 💕
+                    </p>
+
+                    <div id="proposal-buttons" class="flex flex-wrap items-center justify-center gap-5 relative min-h-[100px] py-2">
+                        <button id="yes-btn" type="button" onclick="acceptProposal()"
+                                class="px-9 py-3.5 rounded-full bg-white text-hkDeep font-cute font-bold text-base sm:text-xl shadow-xl hover:bg-hkBlush transform transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer z-20 ring-4 ring-white/30">
+                            ¡SÍ, QUIERO! 🎀💕💞
+                        </button>
+
+                        <button id="no-btn" type="button"
+                                onmouseover="dodgeNoButton(event)"
+                                ontouchstart="dodgeNoButton(event)"
+                                onclick="dodgeNoButton(event)"
+                                class="px-6 py-2.5 rounded-full bg-hkPlum/75 text-hkBlush border border-hkBlush/40 font-cute font-semibold text-sm transition-all duration-200 cursor-pointer z-10 select-none">
+                            No 😅
+                        </button>
+                    </div>
+
+                    <p id="dodge-counter-msg" class="hidden text-xs text-hkBlush font-medium mt-2 italic"></p>
+
+                    <!-- Certificado Oficial de Novios Hello Kitty -->
+                    <div id="proposal-response" class="hidden mt-4 p-6 rounded-2xl bg-white text-hkPlum shadow-2xl border-2 border-hkPink text-center">
+                        <div class="text-4xl mb-2">🎀💍💕💞🥳</div>
+                        <span class="text-[11px] font-cute uppercase tracking-[0.2em] text-hkRed font-bold">
+                            Certificado Oficial de Novios
+                        </span>
+                        <h4 class="font-script text-4xl sm:text-5xl text-hkDeep mt-1 mb-2">
+                            ¡Dijiste que SÍ! 💕💞
+                        </h4>
+                        <p class="text-sm text-hkPlum/85 mb-4">
+                            ¡Me haces la persona más feliz del mundo! Hoy comienza nuestra mejor historia juntos. 🎀💕💞
+                        </p>
+                        <div class="inline-block px-4 py-1.5 rounded-full bg-hkBlush text-hkDeep text-xs font-cute font-bold mb-4">
+                            📅 Fecha oficial: <span id="official-date"></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-3 border-t border-hkBlush text-xs text-hkPlum/75">
+                            <div>
+                                <p class="font-script text-2xl text-hkRed">Ella 🎀💕</p>
+                                <p>La novia más hermosa</p>
+                            </div>
+                            <div>
+                                <p class="font-script text-2xl text-hkRed">Él 💞</p>
+                                <p>El novio más afortunado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="love-storm-btn" type="button" onclick="triggerLoveStorm()"
+                        class="px-7 py-3 rounded-full bg-white text-hkDeep font-cute font-bold text-sm sm:text-base shadow-lg hover:bg-hkBlush transform transition hover:scale-105 active:scale-95 cursor-pointer">
+                    Enviar lluvia de amor 🎀💕💞
+                </button>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- LIGHTBOX MODAL PARA FOTOS -->
+    <div id="lightbox" onclick="closeLightbox(event)"
+         class="fixed inset-0 z-50 hidden bg-hkPlum/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white p-4 sm:p-5 pb-6 rounded-3xl max-w-md w-full shadow-2xl border-2 border-hkPink relative" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeLightbox()"
+                    class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-hkRed text-white font-bold shadow-md hover:bg-hkDeep flex items-center justify-center cursor-pointer">
+                ✕
+            </button>
+            <div class="w-full max-h-[68vh] overflow-hidden rounded-2xl bg-hkBlush flex items-center justify-center">
+                <img id="lightbox-img" src="" alt="Recuerdo" class="w-full h-auto max-h-[68vh] object-contain">
+            </div>
+            <p id="lightbox-caption" class="font-script text-3xl text-center text-hkRed mt-3"></p>
+        </div>
+    </div>
+
+    <script>
+        /* 1. 10 Razones con giro 3D */
+        const reasonsData = [
+            "Amo tu sonrisa y la forma en que arrugas la nariz cuando haces gestos tiernos. 💕",
+            "Me encanta lo bien que nos llevamos y cómo cualquier momento aburrido se vuelve divertido contigo. 💞",
+            "Admiro lo inteligente, fuerte y capaz que eres en todo lo que te propones. 💕",
+            "Me fascinan tus detalles y cómo siempre buscas la manera de demostrarme cariño. 💞",
+            "Amo tus ojos y cómo se te ve hermosa con tus gafas y tu estilo. 💕",
+            "Porque a tu lado puedo ser yo mismo sin miedo a nada. 💞",
+            "Simplemente porque eres tú, y desde que estás en mi vida, todo es mucho mejor. 💕💞",
+            "Me encanta cómo hacemos que cualquier plan simple se vuelva un chiste interno inolvidable. 💞",
+            "Me fascina lo lindo que te ves con tu estilo, tus gafas de aro delgado y tu ternura única. 💕",
+            "Porque conviertes mis días normales en mi aventura favorita, siempre juntos 💕💞"
+        ];
+
+        let flippedCount = 0;
+
+        function buildReasonsGrid() {
+            const grid = document.getElementById('reasons-grid');
+            grid.innerHTML = '';
+
+            reasonsData.forEach((reason, i) => {
+                const num = i + 1;
+                const card = document.createElement('div');
+                card.id = `flip-card-${num}`;
+                card.className = 'flip-card cursor-pointer select-none';
+                card.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-front bg-hkBlush/45 border-2 border-hkPink/40 p-4 flex items-center justify-between gap-3 hover:border-hkRed transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-full bg-white text-hkRed font-cute font-bold flex items-center justify-center text-sm shadow-sm border border-hkPink/40">
+                                    #${num}
+                                </span>
+                                <div class="text-left">
+                                    <p class="font-cute font-bold text-hkPlum text-sm sm:text-base">Razón #${num} 🎀</p>
+                                    <span class="text-xs text-hkDeep/75">Toca para voltear 💕</span>
+                                </div>
+                            </div>
+                            <span class="text-xl">💞</span>
+                        </div>
+                        <div class="flip-back bg-gradient-to-br from-hkRed to-hkDeep text-white shadow-md p-5 flex items-center justify-center text-center">
+                            <p class="text-xs sm:text-sm leading-relaxed font-medium">${reason}</p>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => flipReasonCard(card));
+                grid.appendChild(card);
+            });
+        }
+
+        function flipReasonCard(card) {
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                flippedCount++;
+                const counter = document.getElementById('flip-counter');
+                if (flippedCount === reasonsData.length) {
+                    counter.textContent = '¡Todas descubiertas! Te amo infinito 🎀💕💞';
+                    counter.classList.add('bg-hkRed', 'text-white');
+                    counter.classList.remove('bg-hkBlush', 'text-hkDeep');
+                    triggerMiniConfetti();
+                } else {
+                    counter.textContent = `Descubiertas: ${flippedCount} / ${reasonsData.length} 💕`;
+                }
+            } else {
+                card.classList.remove('flipped');
+            }
+        }
+
+        function flipAllCards() {
+            reasonsData.forEach((_, i) => {
+                const card = document.getElementById(`flip-card-${i + 1}`);
+                if (card && !card.classList.contains('flipped')) {
+                    flipReasonCard(card);
+                }
+            });
+        }
+
+        /* 2. Sobre con moñito Hello Kitty */
+        function breakSeal() {
+            document.getElementById('sealed-envelope').classList.add('hidden');
+            document.getElementById('opened-letter').classList.remove('hidden');
+            triggerMiniConfetti();
+        }
+
+        function resealEnvelope() {
+            document.getElementById('opened-letter').classList.add('hidden');
+            document.getElementById('sealed-envelope').classList.remove('hidden');
+        }
+
+        /* 3. Ruleta de planes y vales */
+        const funPlans = [
+            { icon: "🤗🎀", text: "¡Abrazos infinitos sin soltarnos por al menos 3 minutos! 💕" },
+            { icon: "🍫💞", text: "¡Salida express por un antojo dulce para compartir y reírnos! 💞" },
+            { icon: "😂🎀", text: "¡Sesión oficial de chistes malos, caras graciosas y risas aseguradas! 💕💞" },
+            { icon: "📱💑", text: "¡Maratón de historias, fotos viejas y planes futuros juntos! 💞" }
+        ];
+
+        function spinPlanRoulette() {
+            const badge = document.getElementById('roulette-badge');
+            const resultEl = document.getElementById('roulette-result');
+            const btn = document.getElementById('spin-plan-btn');
+
+            btn.disabled = true;
+            badge.classList.add('wheel-spinning');
+            let ticks = 0;
+
+            const interval = setInterval(() => {
+                const temp = funPlans[ticks % funPlans.length];
+                badge.textContent = temp.icon;
+                resultEl.textContent = "Sorteando plan kawaii...";
+                ticks++;
+
+                if (ticks >= 10) {
+                    clearInterval(interval);
+                    badge.classList.remove('wheel-spinning');
+                    const chosen = funPlans[Math.floor(Math.random() * funPlans.length)];
+                    badge.textContent = chosen.icon;
+                    resultEl.textContent = chosen.text;
+                    btn.disabled = false;
+                    triggerMiniConfetti();
+                }
+            }, 90);
+        }
+
+        const playfulPhrases = [
+            "🎀 ¡Modo Hello Kitty activado! Dúo imparable lleno de ternura 💕💞",
+            "😂 Dato curioso: el nivel de ternura de esta página acaba de romper el medidor 🎀💕💞",
+            "✨ Advertencia: sonreír demasiado al leer esto es 100% inevitable 💞"
+        ];
+        let funPhraseIndex = 0;
+
+        function toggleFunMode() {
+            const body = document.body;
+            const banner = document.getElementById('fun-phrase-banner');
+            const btn = document.getElementById('fun-mode-btn');
+
+            body.classList.toggle('fun-mode');
+            const isActive = body.classList.contains('fun-mode');
+
+            banner.textContent = playfulPhrases[funPhraseIndex % playfulPhrases.length];
+            funPhraseIndex++;
+            banner.classList.remove('hidden');
+
+            if (isActive) {
+                btn.innerHTML = '<span>¡Modo diversión activo! 🎀💕💞</span>';
+                triggerLoveStorm();
+            } else {
+                btn.innerHTML = '<span>¡Modo diversión 💕💞!</span>';
+                triggerMiniConfetti();
+            }
+        }
+
+        function redeemCoupon(el) {
+            if (el.dataset.redeemed === 'true') return;
+            el.dataset.redeemed = 'true';
+            el.style.borderStyle = 'solid';
+            el.style.borderColor = '#E11D48';
+            const badge = el.querySelector('.status-badge');
+            badge.textContent = '¡Canjeado con amor! 🎀💖✓';
+            badge.className = 'status-badge inline-block px-4 py-1 rounded-full bg-hkRed text-white text-xs font-cute font-bold';
+            triggerMiniConfetti();
+        }
+
+        /* 4. Lightbox y respaldo de fotos */
+        function openLightbox(src, caption) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-caption').textContent = caption;
+            document.getElementById('lightbox').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('lightbox').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function customPhoto(e, imgId) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById(imgId).src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function fallbackPhoto(img, idx) {
+            img.onerror = null;
+            const labels = {
+                1: ['🎀💞', 'Mi persona favorita'],
+                2: ['🐱💕', 'Nosotros 💕💞'],
+                3: ['🎀💕', 'Hermosa 💕']
+            };
+            const [icon, title] = labels[idx] || labels[1];
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+                <rect width="600" height="800" fill="#FFE4EC"/>
+                <text x="300" y="360" font-size="110" text-anchor="middle">${icon}</text>
+                <text x="300" y="450" font-family="sans-serif" font-size="32" fill="#9F1239" text-anchor="middle" font-weight="bold">${title}</text>
+            </svg>`;
+            img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        /* 5. Corazones 💕💞 y moñitos 🎀 flotantes */
+        function spawnFloatingItem(burst = false) {
+            const layer = document.getElementById('floating-layer');
+            if (!layer) return;
+            const span = document.createElement('span');
+            const icons = ['💕', '💞', '🎀', '💕', '💞'];
+            span.textContent = icons[Math.floor(Math.random() * icons.length)];
+            span.className = 'float-item';
+            span.style.left = `${Math.random() * 96}vw`;
+            span.style.fontSize = burst ? `${Math.random() * 20 + 20}px` : `${Math.random() * 14 + 14}px`;
+            const duration = burst ? (Math.random() * 3 + 3) : (Math.random() * 8 + 10);
+            span.style.animationDuration = `${duration}s`;
+            layer.appendChild(span);
+            setTimeout(() => span.remove(), duration * 1000);
+        }
+
+        function triggerMiniConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 35,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#E11D48', '#FF85A1', '#FFC2D1', '#FACC15']
+                });
+            }
+        }
+
+        /* 6. Propuesta final */
+        const noDodgePhrases = [
+            "¿Segura? 🥺🎀",
+            "¡Intenta de nuevo! 😂",
+            "Ese botón no sirve 💕",
+            "¡Mejor dale al SÍ! 💞",
+            "¡Casi me atrapas! 😜",
+            "¡Hello Kitty dice que SÍ! 🎀💕"
+        ];
+        let noDodgeCount = 0;
+
+        function dodgeNoButton(e) {
+            if (e) e.preventDefault();
+            const noBtn = document.getElementById('no-btn');
+            const yesBtn = document.getElementById('yes-btn');
+            const counterMsg = document.getElementById('dodge-counter-msg');
+            if (!noBtn) return;
+
+            const offsetX = (Math.random() - 0.5) * 190;
+            const offsetY = (Math.random() - 0.5) * 70;
+            const rot = (Math.random() - 0.5) * 24;
+            noBtn.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${rot}deg)`;
+            noBtn.textContent = noDodgePhrases[noDodgeCount % noDodgePhrases.length];
+            noDodgeCount++;
+
+            if (counterMsg) {
+                counterMsg.classList.remove('hidden');
+                counterMsg.textContent = `Intentos fallidos de decir que no: ${noDodgeCount} 😂🎀💕`;
+            }
+
+            if (yesBtn) {
+                const scale = Math.min(1 + noDodgeCount * 0.09, 1.45);
+                yesBtn.style.transform = `scale(${scale})`;
+            }
+        }
+
+        function acceptProposal() {
+            document.getElementById('proposal-title').textContent = "¡Somos novios! 🎀💕💞";
+            document.getElementById('proposal-subtitle').classList.add('hidden');
+            document.getElementById('proposal-buttons').classList.add('hidden');
+            document.getElementById('dodge-counter-msg').classList.add('hidden');
+
+            const today = new Date();
+            document.getElementById('official-date').textContent = today.toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            document.getElementById('proposal-response').classList.remove('hidden');
+            triggerLoveStorm();
+            setTimeout(() => triggerLoveStorm(), 900);
+        }
+
+        function triggerLoveStorm() {
+            const btn = document.getElementById('love-storm-btn');
+            btn.textContent = '¡Te amo con todo mi corazón! 🎀💕💞';
+
+            if (typeof confetti === 'function') {
+                const end = Date.now() + 2500;
+                (function frame() {
+                    confetti({
+                        particleCount: 6,
+                        angle: 60,
+                        spread: 65,
+                        origin: { x: 0, y: 0.7 },
+                        colors: ['#E11D48', '#FF85A1', '#FFC2D1', '#FACC15']
+                    });
+                    confetti({
+                        particleCount: 6,
+                        angle: 120,
+                        spread: 65,
+                        origin: { x: 1, y: 0.7 },
+                        colors: ['#E11D48', '#FF85A1', '#FFC2D1', '#FACC15']
+                    });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                })();
+            }
+
+            for (let i = 0; i < 34; i++) {
+                setTimeout(() => spawnFloatingItem(true), i * 70);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            buildReasonsGrid();
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => spawnFloatingItem(false), i * 400);
+            }
+            setInterval(() => spawnFloatingItem(false), 1200);
+        });
+    </script>
+</body>
+</html>
